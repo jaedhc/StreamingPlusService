@@ -10,6 +10,7 @@
 
 ``` bash
 composer install
+composer require laravel/sanctum
 ```
 
 ## Configure .env file
