@@ -6,9 +6,20 @@
 - PHP 8.2.12 or above
 - Composer 2.8.2 or above
 
+## Intall composer
+
+``` bash
+composer install
+```
+
 ## Configure .env file
 
 Create and modify your .env file using your desired info.
+
+``` bash
+cp .env.example .env
+php artisan key:generate
+```
 
 ```
 DB_CONNECTION = CONN (mysql)
@@ -18,7 +29,7 @@ DB_DATABASE = DATABASE (streamingplus)
 DB_USERNAME = USERNAME (root)
 DB_PASSWORD = PASSWORD (admin)
 ```
-## Starting project
+## Run migrations
 
 Once configured your db params, you'll need to run the migrations, use the following command:
 
