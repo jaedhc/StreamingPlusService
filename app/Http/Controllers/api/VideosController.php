@@ -7,8 +7,12 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Validator; // Para encriptar la contraseña
 use Illuminate\Database\QueryException;
+use App\Models\User;
 use App\Models\Video;
 use App\Models\VideoContent;
+use App\Models\Comments;
+use App\Models\UserFiles;
+use App\Models\UserPhoto;
 
 class VideosController extends Controller
 {
@@ -114,6 +118,33 @@ class VideosController extends Controller
         } catch (Exception $e) {
             // Captura cualquier otra excepción
             return response()->json(['error' => 'Ocurrió un error inesperado.'], Response::HTTP_INTERNAL_SERVER_ERROR); // Código 500
+        }
+    }
+
+    public function getVideo($videoId = null){
+        if($videoId){
+            try{
+                $video = Video::find($videoId);
+                
+                $videoContent = VideoContent::where('video_id', $video->id)->where('file_type_id', 1)->get();
+                
+                $user = User::find($video->user_id);
+
+                $userFile = UserPhoto::where('user_id', $user->id)->where('file_type_id',1)->get();
+
+                return response()->json([
+                    'video' => $video,
+                    'videoContent' => $videoContent,
+                    'user' => $user,
+                    'userPic' => $userFile
+                ], 200);
+            }catch (QueryException $e) {
+            // Captura cualquier excepción relacionada con la base de datos
+                return response()->json(['error' => $e], Response::HTTP_INTERNAL_SERVER_ERROR); // Código 500
+            } catch (Exception $e) {
+                // Captura cualquier otra excepción
+                return response()->json(['error' => 'Ocurrió un error inesperado.'], Response::HTTP_INTERNAL_SERVER_ERROR); // Código 500
+            }
         }
     }
 }
