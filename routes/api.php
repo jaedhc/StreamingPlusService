@@ -42,6 +42,8 @@ Route::group(['middleware' => ['auth:sanctum']], function(){
     //Ruta para crear video
     Route::post('/video', [VideosController::class, 'createVideo']);
 
+    Route::delete('/video', [VideosController::class, 'deleteVideo']);
+
     //Ruta para que el usuario actual se suscriba a otro
     Route::post('/subscribeTo', [SubscriptionsController::class, 'subscribeTo']);
     //Ruta para eliminar una suscripción

@@ -147,6 +147,29 @@ class VideosController extends Controller
         }
     }
 
+    public function deleteVideo(Request $request){
+        $validator = Validator::make($request->all(),[
+            'video_id' => 'required'
+        ]);
+
+        if($validator->fails()){
+            return response()->json(['error'=>$validator->errors()], 422);
+        }
+
+        $video = Video::find($request->video_id);
+        
+        if($video && $video->user_id == auth()->id()){
+            $video->delete();
+            return response()->json([
+                'message' => 'Video deleted'
+            ], 200);
+        } else {
+            return response()->json([
+                'message' => 'Video not found'
+            ], 200);
+        }
+    }
+
     public function search(Request $request){
         $validator = Validator::make($request->all(),[
             'query' => 'required|string|min:3'
