@@ -49,12 +49,17 @@ class AuthController extends Controller
             $cover->file_type_id = 2;
 
             $cover->save();
+
+            $token = $user->createToken('token')->plainTextToken;
+            $cookie = cookie('cookie_token', $token, 60*24);
+
             return response([
                 'message' => 'User created correctly',
                 'user' => $user,
                 'profile' => $profile,
-                'cover' => $cover
-            ], Response::HTTP_CREATED);
+                'cover' => $cover,
+                'token' => $token
+            ], Response::HTTP_CREATED)->withoutCookie($cookie);
         } catch (QueryException $e) {
             // Captura cualquier excepción relacionada con la base de datos
             return response()->json(['error' => 'Error al crear el usuario.'], Response::HTTP_INTERNAL_SERVER_ERROR); // Código 500
@@ -85,6 +90,7 @@ class AuthController extends Controller
             $cookie = cookie('cookie_token', $token, 60*24);
             return response()->json([
                 'message' => 'Login successful',
+                'user' => $user,
                 'token' => $token
             ], Response::HTTP_OK)->withoutCookie($cookie);
         }

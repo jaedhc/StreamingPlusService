@@ -19,9 +19,15 @@ class UserController extends Controller
     }
 
     public function userProfile(Request $request){
+        
+        $user = User::find(auth()->id());
+        
+        $photos = UserPhoto::where('user_id', auth()->id())->get();
+        
         return response()->json([
             "message" => "userProfile OK",
-            "userData" => auth()->user()
+            "userData" => auth()->user(),
+            "contents" => $photos,
         ], Response::HTTP_OK);
     }
 

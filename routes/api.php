@@ -10,7 +10,7 @@ use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\SubscriptionsController;
 use App\Http\Controllers\Api\CommentController;
 
-Route::get('/users', [UserController::class, 'index']);
+
 //Ruta para registrar usuarios en el sistema
 Route::post('/register', [AuthController::class, 'register']);
 //Ruta para que los usuarios inicien sesión en el sistema
@@ -19,12 +19,14 @@ Route::post('/login', [AuthController::class, 'login']);
 //Ruta que regresa una lista de usuarios
 Route::get('/users', [UserController::class, 'users']);
 //Ruta que regresa la información de un usuario en especifico y sus videos
-Route::get('/users/{userId?}', [UserController::class, 'users']);
+Route::get('/users/{userId?}', [VideosController::class, 'getUserVideos']);
 
 //Ruta para obtener la información de un video en especifico
 Route::get('/video/{videoId?}', [VideosController::class, 'getVideo']);
 //Ruta para buscar videos
 Route::post('/search', [VideosController::class, 'search']);
+
+Route::get('/videos', [VideosController::class, 'getVideos']);
 
 //Las rutas definidas dentro de este grupo serán solo accesibles si el usuario ha iniciado sesión
 Route::group(['middleware' => ['auth:sanctum']], function(){

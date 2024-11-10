@@ -70,53 +70,36 @@ class VideosController extends Controller
         }
     }
 
-    public function getUserVideos(Request $request){
-        $validator = Validator::make($request->all(),[
-            'id_user' => 'required'
-        ]);
-
-        if($validator->fails()){
-            return response()->json(['error'=>$validator->errors()], 422);
-        }
-
-        try{
-            $videos = Video::with('contents')->where('user_id', $request->id_user)->get();
-
-            $result = [];
-
-            foreach ($videos as $video) {
-                $contents = $video->contents->map(function ($content) {
-                    return [
-                        'video_id' => $content->video_id,
-                        'url' => $content->url,
-                        'file_type_id' => $content->file_type_id,
-                        'id' => $content->id,
-                    ];
-                });
-            
-                $result[] = [
-                    'video' => [
-                        'user_id' => $video->user_id,
-                        'title' => $video->title,
-                        'description' => $video->description,
-                        'duration' => $video->duration,
-                        'updated_at' => $video->updated_at,
-                        'created_at' => $video->created_at,
-                        'id' => $video->id,
-                    ],
-                    'covers' => $contents, // Cambiar aquí para incluir múltiples covers
-                ];
+    public function getUserVideos($userId = null){
+        if($userId){
+            try{
+                $user =  User::find($userId);
+                $videos = Video::join('video_contents as vc', 'vc.video_id', '=', 'videos.id')
+                ->join('users as u', 'videos.user_id', '=', 'u.id')
+                ->join('user_photos as up', 'u.id', '=', 'up.user_id')
+                ->select(
+                    'videos.id',
+                    'videos.title',
+                    'videos.duration',
+                    'vc.url as thumbnail',
+                    'u.name',
+                    'up.url as profile'
+                )
+                ->where('vc.file_type_id', 1)
+                ->where('up.file_type_id', 2)
+                ->where('u.id', $userId)
+                ->get();
+                return response()->json([
+                    'userInfo' => $user,
+                    'videos' => $videos
+                ], 200);
+            } catch (QueryException $e) {
+                // Captura cualquier excepción relacionada con la base de datos
+                return response()->json(['error' => $e], Response::HTTP_INTERNAL_SERVER_ERROR); // Código 500
+            } catch (Exception $e) {
+                // Captura cualquier otra excepción
+                return response()->json(['error' => 'Ocurrió un error inesperado.'], Response::HTTP_INTERNAL_SERVER_ERROR); // Código 500
             }
-            return response()->json([
-                'id_user' => $request->id_user,
-                'result' => $result
-            ], 200);
-        } catch (QueryException $e) {
-            // Captura cualquier excepción relacionada con la base de datos
-            return response()->json(['error' => $e], Response::HTTP_INTERNAL_SERVER_ERROR); // Código 500
-        } catch (Exception $e) {
-            // Captura cualquier otra excepción
-            return response()->json(['error' => 'Ocurrió un error inesperado.'], Response::HTTP_INTERNAL_SERVER_ERROR); // Código 500
         }
     }
 
@@ -145,6 +128,34 @@ class VideosController extends Controller
                 return response()->json(['error' => 'Ocurrió un error inesperado.'], Response::HTTP_INTERNAL_SERVER_ERROR); // Código 500
             }
         }
+    }
+
+    public function getVideos(){
+
+        try{
+            $videos = Video::join('video_contents as vc', 'vc.video_id', '=', 'videos.id')
+            ->join('users as u', 'videos.user_id', '=', 'u.id')
+            ->join('user_photos as up', 'u.id', '=', 'up.user_id')
+            ->select(
+                'videos.id',
+                'videos.title',
+                'videos.duration',
+                'vc.url as thumbnail',
+                'u.name',
+                'up.url as profile'
+            )
+            ->where('vc.file_type_id', 1)
+            ->where('up.file_type_id', 2)
+            ->get();
+            return response()->json($videos, 200);
+        }catch (QueryException $e) {
+        // Captura cualquier excepción relacionada con la base de datos
+            return response()->json(['error' => $e], Response::HTTP_INTERNAL_SERVER_ERROR); // Código 500
+        } catch (Exception $e) {
+            // Captura cualquier otra excepción
+            return response()->json(['error' => 'Ocurrió un error inesperado.'], Response::HTTP_INTERNAL_SERVER_ERROR); // Código 500
+        }
+        
     }
 
     public function deleteVideo(Request $request){
