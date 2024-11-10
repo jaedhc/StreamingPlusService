@@ -4,26 +4,36 @@ namespace App\Http\Middleware;
 
 use Closure;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Auth\AuthenticationException;
 use Symfony\Component\HttpFoundation\Response;
 
 class Authenticate
 {
-    /**
-     * Handle an incoming request.
-     *
-     * @param  \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response)  $next
-     */
-    public function handle(Request $request, Closure $next, ...$guards){
-        if($token = $request->cookie('cookie_token')){
-            $request->headers-set('Authorization', 'Bearer'.$token);
+    public function handle(Request $request, Closure $next, ...$guards)
+    {
+        $this->authenticate($guards);
+
+        return $next($request);
+    }
+
+    protected function authenticate(array $guards)
+    {
+        if (empty($guards)) {
+            $guards = [null];
         }
 
-        if (!Auth::guard($guard)->check()) {
-            // Devuelve un JSON de error en lugar de redirigir
-            return Response::json(['message' => 'Unauthorized'], 401);
-        } else {
-            $this->authenticate($request, $guards);
-            return $next;
+        foreach ($guards as $guard) {
+            if (Auth::guard($guard)->check()) {
+                return Auth::shouldUse($guard);
+            }
         }
+
+        $this->unauthenticated();
+    }
+
+    protected function unauthenticated()
+    {
+        throw new AuthenticationException('Unauthenticated.');
     }
 }

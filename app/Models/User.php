@@ -7,6 +7,9 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
+use App\Models\Comment;
+use App\Models\Video;
+use App\Models\UserPhoto;
 
 class User extends Authenticatable
 {
@@ -24,4 +27,19 @@ class User extends Authenticatable
         'remember_token',
     ];
 
+
+    public function comments()
+    {
+        return $this->hasMany(Comment::class);
+    }
+
+    public function videos()
+    {
+        return $this->hasMany(Video::class);
+    }
+
+    public function user_photos()
+    {
+        return $this->hasMany(UserPhoto::class);
+    }
 }

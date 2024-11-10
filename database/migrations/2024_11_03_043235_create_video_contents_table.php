@@ -17,7 +17,7 @@ return new class extends Migration
             $table->string('url');
             $table->unsignedBigInteger('file_type_id');
 
-            $table->foreign('video_id')->references('id')->on('videos');
+            $table->foreign('video_id')->references('id')->on('videos')->onDelete('cascade');
             $table->foreign('file_type_id')->references('id')->on('video_files');
         });
     }

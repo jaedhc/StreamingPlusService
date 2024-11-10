@@ -25,7 +25,6 @@ class UserController extends Controller
         ], Response::HTTP_OK);
     }
 
-
     public function users($userId = null){
         if($userId){
             try{
@@ -114,6 +113,23 @@ class UserController extends Controller
                 ], 200);
             }
         }catch (QueryException $e) {
+            // Captura cualquier excepción relacionada con la base de datos
+            return response()->json(['error' => $e], Response::HTTP_INTERNAL_SERVER_ERROR); // Código 500
+        } catch (Exception $e) {
+            // Captura cualquier otra excepción
+            return response()->json(['error' => 'Ocurrió un error inesperado.'], Response::HTTP_INTERNAL_SERVER_ERROR); // Código 500
+        }
+    }
+
+    public function deleteUser(){
+        try{
+            $user = User::find(auth()->id());
+            $user->delete();
+
+            return response()->json([
+                'message' => 'User deleted succesfully'
+            ], 200);
+        } catch (QueryException $e) {
             // Captura cualquier excepción relacionada con la base de datos
             return response()->json(['error' => $e], Response::HTTP_INTERNAL_SERVER_ERROR); // Código 500
         } catch (Exception $e) {

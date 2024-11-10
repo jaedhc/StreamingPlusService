@@ -18,7 +18,6 @@ class VideosController extends Controller
 {
     public function createVideo(Request $request){
         $validator = Validator::make($request->all(),[
-            'id_user' => 'required',
             'title' => 'required',
             'description' => 'required',
             'url_video' => 'required',
@@ -32,7 +31,7 @@ class VideosController extends Controller
 
         try{
             $video = new Video();   
-            $video->user_id = $request->id_user;
+            $video->user_id = auth()->id();
             $video->title = $request->title;
             $video->description = $request->description;
             $video->duration = $request->duration;
@@ -146,5 +145,20 @@ class VideosController extends Controller
                 return response()->json(['error' => 'Ocurrió un error inesperado.'], Response::HTTP_INTERNAL_SERVER_ERROR); // Código 500
             }
         }
+    }
+
+    public function search(Request $request){
+        $validator = Validator::make($request->all(),[
+            'query' => 'required|string|min:3'
+        ]);
+
+        $query = $request->input('query');
+
+        $videos = Video::where('title', 'LIKE', '%' . $query . '%')->get();
+
+        return response()->json([
+            'message' => 'videos found',
+            'videos' => $videos
+        ], 200);
     }
 }
