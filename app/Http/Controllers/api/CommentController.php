@@ -39,4 +39,19 @@ class CommentController extends Controller
             return response()->json(['error' => 'Ocurrió un error inesperado.'], Response::HTTP_INTERNAL_SERVER_ERROR); // Código 500
         }
     }
+
+    public function getComments($videoId = null){
+        if($videoId){
+            $comments = Comment::select('comments.content', 'us.name', 'up.url')
+                                ->join('users as us', 'comments.user_id', '=', 'us.id')
+                                ->join('user_photos as up', 'comments.user_id', '=', 'up.user_id')
+                                ->where('comments.video_id', $videoId)
+                                ->where('up.file_type_id', 1)
+                                ->get();
+
+            return response()->json([
+                'comments' => $comments
+            ], 200);
+        }
+    }
 }

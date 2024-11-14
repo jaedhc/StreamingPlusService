@@ -85,8 +85,8 @@ class VideosController extends Controller
                     'u.name',
                     'up.url as profile'
                 )
-                ->where('vc.file_type_id', 1)
-                ->where('up.file_type_id', 2)
+                ->where('vc.file_type_id', 2)
+                ->where('up.file_type_id', 1)
                 ->where('u.id', $userId)
                 ->get();
                 return response()->json([
@@ -144,8 +144,8 @@ class VideosController extends Controller
                 'u.name',
                 'up.url as profile'
             )
-            ->where('vc.file_type_id', 1)
-            ->where('up.file_type_id', 2)
+            ->where('vc.file_type_id', 2)
+            ->where('up.file_type_id', 1)
             ->get();
             return response()->json($videos, 200);
         }catch (QueryException $e) {
@@ -188,7 +188,21 @@ class VideosController extends Controller
 
         $query = $request->input('query');
 
-        $videos = Video::where('title', 'LIKE', '%' . $query . '%')->get();
+        $videos = Video::join('video_contents as vc', 'vc.video_id', '=', 'videos.id')
+                        ->join('users as u', 'videos.user_id', '=', 'u.id')
+                        ->join('user_photos as up', 'u.id', '=', 'up.user_id')
+                        ->select(
+                            'videos.id',
+                            'videos.title',
+                            'videos.duration',
+                            'vc.url as thumbnail',
+                            'u.name',
+                            'up.url as profile'
+                        )
+                        ->where('title', 'LIKE', '%' . $query . '%')
+                        ->where('vc.file_type_id', 2)
+                        ->where('up.file_type_id', 1)
+                        ->get();
 
         return response()->json([
             'message' => 'videos found',

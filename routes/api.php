@@ -28,6 +28,9 @@ Route::post('/search', [VideosController::class, 'search']);
 
 Route::get('/videos', [VideosController::class, 'getVideos']);
 
+    //Ruta para obtener comentarios de un video
+    Route::get('/comments/{videoId?}', [CommentController::class, 'getComments']);
+
 //Las rutas definidas dentro de este grupo serán solo accesibles si el usuario ha iniciado sesión
 Route::group(['middleware' => ['auth:sanctum']], function(){
     //Obtener perfil del usuario actual
@@ -50,9 +53,10 @@ Route::group(['middleware' => ['auth:sanctum']], function(){
     Route::post('/subscribeTo', [SubscriptionsController::class, 'subscribeTo']);
     //Ruta para eliminar una suscripción
     Route::post('/removeSubscription', [SubscriptionsController::class, 'removeSubscription']);
+    //Ruta para saber si un usuario está suscrito o no
+    Route::post('/subscribedTo', [SubscriptionsController::class, 'isSuscribed']);
     
     //Ruta para agrear un comentario a un video
     Route::post('/comment', [CommentController::class, 'createComment']);
-
 
 });
