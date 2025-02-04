@@ -1,0 +1,39 @@
+name: Deploy
+
+on:
+  workflow_run:
+    workflows: ["Tests"]  # El CD se ejecuta solo si el CI pasa
+    types:
+      - completed
+
+jobs:
+  deploy:
+    runs-on: self-hosted  # Ejecuta el despliegue en tu self-hosted runner (Windows)
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Deploy to production server (Windows)
+        shell: powershell
+        run: |
+          echo "Desplegando el servicio"
+
+          cd C:\Apache24\streaming
+
+          git reset --hard
+          git pull origin main
+
+          # Instalar dependencias de Composer
+          composer install --no-dev --optimize-autoloader
+
+          # Ejecutar migraciones con --force para evitar confirmación
+          php artisan migrate --force
+
+          # Limpiar y cachear configuración
+          php artisan config:clear
+          php artisan config:cache
+          php artisan route:cache
+          php artisan view:
+          
+          Restart-Service -Name "Apache2.4" -Force
