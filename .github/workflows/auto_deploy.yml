@@ -21,8 +21,8 @@ jobs:
 
           cd C:\Apache24\streaming
 
-          git reset --hard
-          git pull origin main
+          git fetch origin
+          git merge origin/main
 
           # Instalar dependencias de Composer
           composer install --no-dev --optimize-autoloader
