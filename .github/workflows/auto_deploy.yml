@@ -19,7 +19,7 @@ jobs:
         run: |
           echo "Desplegando el servicio"
 
-          cd C:\Apache24\streaming
+          cd C:\Apache24\StreamingPlusService
 
           git fetch origin
           git merge origin/main
